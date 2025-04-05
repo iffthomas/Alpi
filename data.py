@@ -85,7 +85,6 @@ class DataLoader:
         features["DATETIME_COPY"] = features["DATETIME"]  # optional copy if needed
         features.set_index("DATETIME", inplace=True)
 
-        print(features.head())
 
         # Split the data based on the index (date)
         train_consumptions = consumptions[consumptions.index < split_date]
@@ -223,6 +222,7 @@ class FeatureEncoding:
         #drop Datetime column
         self.features = self.features.drop(columns=["DATETIME_COPY"])
 
+        
 
 
 
