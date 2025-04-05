@@ -188,7 +188,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                 grid_search = GridSearchCV(
                     estimator=xgb_estimator,
                     param_grid=param_grid,
-                    cv=3,
+                    cv=1,
                     scoring='neg_mean_absolute_error',
                     verbose=1
                 )
