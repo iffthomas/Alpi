@@ -210,7 +210,7 @@ class FeatureEncoding:
         customer_name = self.customer
         customer_name = customer_name.replace("VALUEMWHMETERINGDATA","INITIALROLLOUTVALUE")
         feature_cols = ["spv","temp","holiday","DATETIME_COPY",customer_name]
-  
+
         self.features = self.features[feature_cols]
 
         self.features["Month"] = self.features["DATETIME_COPY"].dt.month
@@ -218,6 +218,22 @@ class FeatureEncoding:
         self.features["Hour"] = self.features["DATETIME_COPY"].dt.hour
         self.features["Dayofweek"] = self.features["DATETIME_COPY"].dt.dayofweek
         
+
+        self.features["log_spv"] = np.log(self.features["spv"] + 1e-9)  # Adding a small constant to avoid log(0)
+        self.features["log_temp"] = np.log(self.features["temp"] + 1e-9)  # Adding a small constant to avoid log(0)
+
+        self.features["cosine_hour"] = np.cos(2 * np.pi * self.features["Hour"] / 24)
+        self.features["sine_hour"] = np.sin(2 * np.pi * self.features["Hour"] / 24)
+
+        self.features["cosine_day"] = np.cos(2 * np.pi * self.features["Day"] / 31)
+        self.features["sine_day"] = np.sin(2 * np.pi * self.features["Day"] / 31)
+
+        self.features["cosine_month"] = np.cos(2 * np.pi * self.features["Month"] / 12)
+        self.features["sine_month"] = np.sin(2 * np.pi * self.features["Month"] / 12)
+
+
+
+
 
         #drop Datetime column
         self.features = self.features.drop(columns=["DATETIME_COPY"])

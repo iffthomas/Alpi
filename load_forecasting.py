@@ -8,7 +8,8 @@ import csv
 from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding, FeatureEncoding
 # depending on your IDE, you might need to add datathon_eth. in front of forecast_models
 from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel
-
+import warnings
+warnings.filterwarnings("ignore")
 def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split_date :str , feature_sets:str, global_model: bool, inputation_method:str = "ffill"):
     """
 
@@ -218,7 +219,7 @@ if __name__ == "__main__":
 
     main(country,
         encoding_name="calculate_custom_features",
-        model_name="linear_regression",
+        model_name="xgboost",
         train_test=train_test,
         split_date=split_date,
         feature_sets=features,
