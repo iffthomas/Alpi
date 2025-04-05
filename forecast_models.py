@@ -4,6 +4,11 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 import xgboost as xgb
 
+from catboost import CatBoostRegressor
+import pandas as pd
+import numpy as np
+
+
 class SimpleModel:
     """
     This is a simple example of a model structure
@@ -41,6 +46,34 @@ class ARIMAModel:
     def predict(self, start, end):
         # Produces forecasts from start to end
         return self.results.predict(start=start, end=end)
+
+
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+class MultiTimeSeriesForecaster:
+    def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 24)):
+        self.order = order
+        self.seasonal_order = seasonal_order
+        self.model = None
+        self.results = None
+
+    def train(self, y, X):
+        # y: target series (Pandas Series)
+        # X: exogenous variables (Pandas DataFrame with same index)
+        y = y.dropna()
+        X = X.loc[y.index]  # Align X with y
+    
+        y = y.fillna(y.mean())
+        X = X.fillna(X.mean())
+
+    
+
+        self.model = SARIMAX(endog=y, exog=X, order=self.order, seasonal_order=self.seasonal_order)
+        self.results = self.model.fit(disp=False)
+
+    def predict(self, start, end, exog):
+        # exog: future values of X from start to end
+        return self.results.predict(start=start, end=end, exog=exog)
 
 
 class GaussianProcessModel:
@@ -94,7 +127,33 @@ class XGBoostModel:
 
         return self.xgboost.predict(x)
     
-    
+
+
+class CatBoostModel:
+    def __init__(self, params=None):
+        default_params = {
+            'iterations': 500,
+            'learning_rate': 0.05,
+            'depth': 6,
+            'loss_function': 'RMSE',
+            'verbose': 100,
+        }
+        if params:
+            default_params.update(params)
+
+        self.model = CatBoostRegressor(**default_params)
+
+    def train(self, x, y, cat_features=None):
+        # Align x and y (in case y had NaNs)
+        y = y.dropna()
+        x = x.loc[y.index]
+
+        self.model.fit(x, y, cat_features=cat_features)
+
+    def predict(self, x):
+        return self.model.predict(x)
+
+
 from pygam import LinearGAM, s, f
 import numpy as np
 import pandas as pd

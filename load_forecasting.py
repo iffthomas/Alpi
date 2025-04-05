@@ -3,11 +3,12 @@ import numpy as np
 from os.path import join
 import os
 import csv
-
+from sklearn.model_selection import GridSearchCV
+from xgboost import XGBRegressor
 # depending on your IDE, you might need to add datathon_eth. in front of data
 from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding, FeatureEncoding
 # depending on your IDE, you might need to add datathon_eth. in front of forecast_models
-from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel, GAMModel
+from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel, GAMModel, CatBoostModel, MultiTimeSeriesForecaster
 import warnings
 warnings.filterwarnings("ignore")
 def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split_date :str , feature_sets:str, global_model: bool, inputation_method:str = "ffill", start_date:str = None):
@@ -156,12 +157,58 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                 model.train(feature_past, consumption_clean)
                 output = model.predict(feature_future)
 
-
             elif model_name == "gam":
                 # Generalized Additive Model (GAM)
                 model = GAMModel()
                 model.train(feature_past, consumption_clean)
                 output = model.predict(feature_future)
+
+            elif model_name == "catboost":
+                # CatBoost Model
+                model = CatBoostModel()
+                model.train(feature_past, consumption_clean)
+                output = model.predict(feature_future)
+
+            elif model_name == "xgboost_gridsearch":
+        
+                # Uncomment the grid search code to use GridSearchCV for hyperparameter tuning
+
+
+                # Define the parameter grid
+                param_grid = {
+                    'n_estimators': [50, 100],
+                    'max_depth': [3, 5, 7],
+                    'learning_rate': [0.01, 0.1, 0.2]
+                }
+
+                # Initialize the estimator
+                xgb_estimator = XGBRegressor(objective='reg:squarederror', random_state=42)
+                
+                # Set up the grid search with 3-fold CV
+                grid_search = GridSearchCV(
+                    estimator=xgb_estimator,
+                    param_grid=param_grid,
+                    cv=3,
+                    scoring='neg_mean_absolute_error',
+                    verbose=1
+                )
+                
+                # Perform grid search
+                grid_search.fit(feature_past, consumption_clean)
+                
+                # Output the best parameters
+                print("Best parameters found: ", grid_search.best_params_)
+                
+                # Retrieve the best estimator and predict
+                best_model = grid_search.best_estimator_
+                output = best_model.predict(feature_future)
+
+            elif model_name == "multi_time_series":
+                # Multi Time Series Model
+                model = MultiTimeSeriesForecaster()
+                model.train(consumption_clean, feature_past)
+                output = model.predict(feature_future)
+
             else:
             
                 print("NO Model specified sofar")
@@ -244,7 +291,7 @@ if __name__ == "__main__":
         print("Using the start date: ", start_date)
         main(country,
             encoding_name="calculate_custom_features",
-            model_name="xgboost",
+            model_name="multi_time_series",
             train_test=train_test,
             split_date=split_date,
             feature_sets=features,
