@@ -3,7 +3,7 @@ import numpy as np
 from os.path import join
 import os
 import csv
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, PredefinedSplit
 from xgboost import XGBRegressor
 # depending on your IDE, you might need to add datathon_eth. in front of data
 from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding, FeatureEncoding
@@ -176,19 +176,21 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
                 # Define the parameter grid
                 param_grid = {
-                    'n_estimators': [50, 100],
-                    'max_depth': [3, 5, 7],
-                    'learning_rate': [0.01, 0.1, 0.2]
+                    'n_estimators': [20, 50, 100, 200],
+                    'max_depth': [3, 5, 7, 10],
+                    'learning_rate': [0.00,0.01, 0.1, 0.2]
                 }
 
                 # Initialize the estimator
                 xgb_estimator = XGBRegressor(objective='reg:squarederror', random_state=42)
+
+                ps = PredefinedSplit(test_fold = consumption_clean)
                 
                 # Set up the grid search with 3-fold CV
                 grid_search = GridSearchCV(
                     estimator=xgb_estimator,
                     param_grid=param_grid,
-                    cv=1,
+                    cv=ps,
                     scoring='neg_mean_absolute_error',
                     verbose=1
                 )
