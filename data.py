@@ -57,6 +57,7 @@ class DataLoader:
 
         rollout_path = join(self.path, "rollout_data_" + country + ".csv")
         rollout = pd.read_csv(rollout_path, index_col=0, parse_dates=True, date_format=date_format)
+        rollout = rollout.reset_index()
 
         consumptions = pd.read_csv(
             consumptions_path, index_col=0, parse_dates=True, date_format=date_format
@@ -69,11 +70,22 @@ class DataLoader:
             date_format=date_format,
         )
 
+        features = features.reset_index()
+        features = features.rename(columns={"index": "DATETIME"})
+
+
+
         features = pd.merge(features, rollout, on="DATETIME", how="left")
 
 
         # Convert split_date to a datetime object if it's not already one
         split_date = pd.to_datetime(split_date, format=date_format)
+
+        features["DATETIME"] = pd.to_datetime(features["DATETIME"])
+        features["DATETIME_COPY"] = features["DATETIME"]  # optional copy if needed
+        features.set_index("DATETIME", inplace=True)
+
+        print(features.head())
 
         # Split the data based on the index (date)
         train_consumptions = consumptions[consumptions.index < split_date]
@@ -183,7 +195,7 @@ class ImputationEncoding:
 
 
 class FeatureEncoding:
-    def __init__(self, consumption: pd.DataFrame, features: pd.DataFrame, start_training, end_training, start_forecast, end_forecast, method):
+    def __init__(self, consumption: pd.DataFrame, features: pd.DataFrame, start_training, end_training, start_forecast, end_forecast,customer):
         self.consumption = consumption
         self.features = features
         self.start_training = start_training
@@ -191,11 +203,54 @@ class FeatureEncoding:
         self.start_forecast = start_forecast
         self.end_forecast = end_forecast
         self.consumption_mask = ~consumption.isna()
-        self.method = method
+        self.customer = customer
 
-    def calculate_features(self, features: pd.DataFrame, consumption: pd.DataFrame):
+
+    def calculate_features(self):
+
+        customer_name = self.customer
+        customer_name = customer_name.replace("VALUEMWHMETERINGDATA","INITIALROLLOUTVALUE")
+        feature_cols = ["spv","temp","holiday","DATETIME_COPY",customer_name]
+  
+        self.features = self.features[feature_cols]
+
+        self.features["Month"] = self.features["DATETIME_COPY"].dt.month
+        self.features["Day"] = self.features["DATETIME_COPY"].dt.day
+        self.features["Hour"] = self.features["DATETIME_COPY"].dt.hour
+        self.features["Dayofweek"] = self.features["DATETIME_COPY"].dt.dayofweek
+        
+
+        #drop Datetime column
+        self.features = self.features.drop(columns=["DATETIME_COPY"])
+
+
+
+
+
+        #do imputation of missing values in the features
+     
+        for feature in self.features.columns:
+            self.features[feature] = self.features[feature].fillna(self.features[feature].mean())
+        self.consumption = self.consumption.fillna(self.consumption.mean())
+
+        #scale the features
+        if True == False: 
+            from sklearn.preprocessing import MinMaxScaler
+            scaler = MinMaxScaler()
+            self.features[feature_cols] = scaler.fit_transform(self.features[feature_cols])
+
+
         # Example feature calculation: mean and standard deviation of consumption
-        pass
+        features_past = self.features[self.start_training : self.end_training]
+        features_future = self.features[self.start_forecast : self.end_forecast]
+
+        consumption_past = self.consumption[self.start_training : self.end_training]
+        consumption_future = self.consumption[self.start_forecast : self.end_forecast]
+
+
+        #do imputa
+
+        return features_past, features_future, consumption_past, consumption_future
 
 
 

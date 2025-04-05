@@ -35,9 +35,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
         #join train_features and test_features
         features_train_and_test = pd.concat([train_features,test_features])
 
-
-
-
         print(features_train_and_test)
 
         #calculate a lot of features for the training set
@@ -78,11 +75,12 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
             if train_test:
 
                 feature_dummy =  features_train_and_test[feature_sets].loc[start_training:]
-
+                if encoding_name == "calculate_custom_features":
+                    feature_dummy =  features_train_and_test.loc[start_training:]
             else:
                 feature_dummy = features[feature_sets].loc[start_training:]
 
-
+            
 
 
             if encoding_name == "baseline_encoding":
@@ -105,7 +103,14 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                 pass
         
             elif encoding_name=="calculate_custom_features":
-                pass
+
+                encoding = FeatureEncoding(
+                    consumption, feature_dummy, start_training, end_training, start_forecast, end_forecast, customer=costumer
+                )
+
+                feature_past, feature_future, consumption_clean, consumption_test = encoding.calculate_features()
+
+                print(feature_past, feature_future)
 
             else:
                 print("NO Encoding specified sofar")
@@ -146,6 +151,8 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
             
                 print("NO Model specified sofar")
                 raise ValueError("No model specified")
+            
+   
         
             forecast[costumer] = output
 
@@ -212,7 +219,7 @@ if __name__ == "__main__":
     inputation_method = "mean"
 
     main(country,
-        encoding_name="baseline_encoding",
+        encoding_name="calculate_custom_features",
         model_name="xgboost",
         train_test=train_test,
         split_date=split_date,
