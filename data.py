@@ -25,6 +25,8 @@ class DataLoader:
         consumptions = pd.read_csv(
             consumptions_path, index_col=0, parse_dates=True, date_format=date_format
         )
+
+
         features = pd.read_excel(
             features_path,
             sheet_name=country,
@@ -34,6 +36,8 @@ class DataLoader:
         )
 
         features = pd.merge(features, rollout, on="DateTime", how="left")
+        
+        #drop all indices with NanValue in the consumption and then drop the same indices in the features
 
 
 
@@ -43,6 +47,7 @@ class DataLoader:
             parse_dates=True,
             date_format=date_format,
         )
+        example_solution = example_solution.dropna()
 
         return consumptions, features, example_solution
 
@@ -236,7 +241,6 @@ class FeatureEncoding:
 
 
 
-
         for feature in self.features.columns:
             #if data type is categorical, do mode imputation
             if self.features[feature].dtype == "category":
@@ -246,12 +250,6 @@ class FeatureEncoding:
         self.consumption = self.consumption.fillna(self.consumption.mean())
 
 
-
-        #scale the features
-        if True == False: 
-            from sklearn.preprocessing import MinMaxScaler
-            scaler = MinMaxScaler()
-            self.features[feature_cols] = scaler.fit_transform(self.features[feature_cols])
 
 
         # Example feature calculation: mean and standard deviation of consumption

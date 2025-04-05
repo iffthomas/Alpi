@@ -71,7 +71,7 @@ class GaussianProcessModel:
         else:
             return self.model.predict(features_future)
 
-
+import numpy as np
 
 class XGBoostModel:
 
@@ -80,7 +80,16 @@ class XGBoostModel:
         self.xgboost = xgb.XGBRegressor(enable_categorical=True)
 
     def train(self, x, y):
+
+
+        #drop NaNs and Infs
+        y = y.dropna()
+        x = x.loc[y.index]
+
         self.xgboost.fit(x, y)
-    
+
+
+            
     def predict(self, x):
+
         return self.xgboost.predict(x)

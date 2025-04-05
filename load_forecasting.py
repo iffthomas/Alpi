@@ -118,6 +118,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
             if model_name == "linear_regression":
                 model = SimpleModel()
                 model.train(feature_past, consumption_clean)
+
                 output = model.predict(feature_future)
 
             elif model_name == "arima":
@@ -210,7 +211,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     print(f'Dummy Error {dummy_error}')
 
 if __name__ == "__main__":
-    country = "ES"  # it can be ES or IT
+    country = "IT"  # it can be ES or IT
     split_date = "2024-07-01 00:00:00"
     train_test = True
     features = ["temp"]
