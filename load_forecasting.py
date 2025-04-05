@@ -141,6 +141,12 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                     print("NaN values found in the output. Filling with mean.")
                     output = output.fillna(consumption_clean.mean())
 
+            elif model_name == "random_forest":
+                # Random Forest Model
+                model = RandomForestModel()
+                model.train(feature_past, consumption_clean)
+                output = model.predict(feature_future)
+
             elif model_name == "gaussian_process":
                 # Gaussian Process Model
                 model = GaussianProcessModel()
@@ -257,6 +263,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     max_error = np.max(numpy_error)
 
     print("\n")
+    print(f"Total Error: {dummy_error.sum().sum()}")
     print(f"Max Mean Error: {max_mean_error:.4f} by: {customer_id[max_mean_error_index]}")
     print(f"Overall Mean Error:{overall_mean_error:.4f}")
     print(f"Max Error:{max_error:.4f}")
@@ -308,7 +315,7 @@ if __name__ == "__main__":
     country = "IT"  # it can be ES or IT
     split_date = "2024-08-01 00:00:00"
     train_test = True
-    features = ["temp", "holiday"]  # choice = ["temp", "holiday"]
+    features = ["spv", "temp", "holiday"]  # choice = ["temp", "holiday"]
     global_model = False
     inputation_method = "mean"
     start_date = None

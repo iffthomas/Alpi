@@ -1,7 +1,12 @@
 from sklearn.linear_model import LinearRegression
-from statsmodels.tsa.arima.model import ARIMA
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from statsmodels.tsa.arima.model import ARIMA
+
 import xgboost as xgb
 
 import pandas as pd
@@ -22,6 +27,36 @@ class SimpleModel:
 
     def predict(self, x):
         return self.linear_regression.predict(x)
+    
+
+class SVRModel:
+    """
+    This is a simple example of a model structure
+
+    """
+
+    def __init__(self):
+        self.svr = make_pipeline(StandardScaler(), SVR(kernel='rbf', C=1.0, epsilon=0.1))
+
+    def train(self, x, y):
+        self.svr.fit(x, y)
+
+    def predict(self, x):
+        return self.svr.predict(x)
+
+class RandomForestModel:
+    def __init__(self, n_estimators=500, random_state=42):
+        # Initialize the Random Forest Regressor
+        self.random_forest = RandomForestRegressor(n_estimators=n_estimators, random_state=random_state)
+
+    def train(self, x, y):
+        # Fit the model to the training data
+        self.random_forest.fit(x, y)
+
+    def predict(self, x):
+        # Predict using the trained model
+        return self.random_forest.predict(x)
+
 
 class ARIMAModel:
     """This is an ARIMA Model that is used for predicting a specific timeframe"""
