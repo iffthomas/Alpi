@@ -77,7 +77,7 @@ class XGBoostModel:
 
     def __init__(self, params=None):
 
-        self.xgboost = xgb.XGBRegressor()
+        self.xgboost = xgb.XGBRegressor(enable_categorical=True)
 
     def train(self, x, y):
         self.xgboost.fit(x, y)

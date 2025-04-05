@@ -212,7 +212,7 @@ class FeatureEncoding:
         feature_cols = ["spv","temp","holiday","DATETIME_COPY",customer_name]
 
         self.features = self.features[feature_cols]
-
+        
         self.features["Month"] = self.features["DATETIME_COPY"].dt.month
         self.features["Day"] = self.features["DATETIME_COPY"].dt.day
         self.features["Hour"] = self.features["DATETIME_COPY"].dt.hour
@@ -231,23 +231,19 @@ class FeatureEncoding:
         self.features["cosine_month"] = np.cos(2 * np.pi * self.features["Month"] / 12)
         self.features["sine_month"] = np.sin(2 * np.pi * self.features["Month"] / 12)
 
-
-
-
-
         #drop Datetime column
         self.features = self.features.drop(columns=["DATETIME_COPY"])
 
-        
 
-
-
-
-        #do imputation of missing values in the features
-     
         for feature in self.features.columns:
-            self.features[feature] = self.features[feature].fillna(self.features[feature].mean())
+            #if data type is categorical, do mode imputation
+            if self.features[feature].dtype == "category":
+                continue
+            else:
+                self.features[feature] = self.features[feature].fillna(self.features[feature].mean())
         self.consumption = self.consumption.fillna(self.consumption.mean())
+
+
 
         #scale the features
         if True == False: 
