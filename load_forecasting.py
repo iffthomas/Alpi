@@ -176,8 +176,8 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
                 # Define the parameter grid
                 param_grid = {
-                    'n_estimators': [20, 50, 100, 200],
-                    'max_depth': [3, 5, 7, 10],
+                    'n_estimators': [ 50, 100, 200],
+                    'max_depth': [3, 5, 7],
                     'learning_rate': [0.00,0.01, 0.1, 0.2],
                     'lambda': [0.0, 0.1, 1.0],
                     'alpha': [0.0, 0.1, 1.0],
