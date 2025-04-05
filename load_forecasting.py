@@ -5,7 +5,7 @@ import os
 import csv
 
 # depending on your IDE, you might need to add datathon_eth. in front of data
-from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding
+from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding, FeatureEncoding
 # depending on your IDE, you might need to add datathon_eth. in front of forecast_models
 from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel
 
@@ -35,6 +35,15 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
         #join train_features and test_features
         features_train_and_test = pd.concat([train_features,test_features])
 
+
+
+
+        print(features_train_and_test)
+
+        #calculate a lot of features for the training set
+
+
+
     else:
         training_set, features, test_set = loader.load_data(zone)
         print("Predicting For the Dummy-Set")
@@ -60,7 +69,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
             pass
 
     else:
-
         print("We are using Models for each customer")
         print("------------------------------------------------------")
         for costumer in training_set.columns.values:
@@ -71,10 +79,11 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
                 feature_dummy =  features_train_and_test[feature_sets].loc[start_training:]
 
-
-            
             else:
                 feature_dummy = features[feature_sets].loc[start_training:]
+
+
+
 
             if encoding_name == "baseline_encoding":
 
@@ -93,8 +102,9 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                     encoding.meta_encoding()
                 )
 
-
-
+                pass
+        
+            elif encoding_name=="calculate_custom_features":
                 pass
 
             else:
@@ -199,10 +209,10 @@ if __name__ == "__main__":
     train_test = True
     features = ["temp"]
     global_model = False
-    inputation_method = "past-year"
+    inputation_method = "mean"
 
     main(country,
-        encoding_name="custom_encoding",
+        encoding_name="baseline_encoding",
         model_name="xgboost",
         train_test=train_test,
         split_date=split_date,
