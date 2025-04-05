@@ -51,7 +51,7 @@ class ARIMAModel:
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 class MultiTimeSeriesForecaster:
-    def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 24)):
+    def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 24*7*4)):
         self.order = order
         self.seasonal_order = seasonal_order
         self.model = None
