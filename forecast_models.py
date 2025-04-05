@@ -93,3 +93,41 @@ class XGBoostModel:
     def predict(self, x):
 
         return self.xgboost.predict(x)
+from pygam import LinearGAM, s, f
+import numpy as np
+import pandas as pd
+
+class GAMModel:
+    def __init__(self, params=None):
+        # You can set default parameters or pass them via 'params'
+        self.params = params or {}
+        # Here we create a simple LinearGAM with smooth terms.
+        # Adjust the spline basis (s) or factor (f) terms as needed based on your features.
+        # For example, if you have 10 features, you might initialize:
+        # self.gam = LinearGAM(s(0) + s(1) + s(2) + s(3) + s(4) + s(5) + s(6) + s(7) + s(8) + s(9), **self.params)
+        # For a generic implementation, we delay setting up the terms until training.
+        self.gam = None
+
+    def train(self, x: pd.DataFrame, y: pd.Series):
+        # Drop NaNs and Infs in target and align features
+        y = y.dropna()
+        x = x.loc[y.index]
+
+        n_features = x.shape[1]
+        # Create a sum of smooth splines for each feature.
+        term_list = [s(i) for i in range(n_features)]
+        # Initialize with the first term, then add the rest
+        terms = term_list[0]
+        for term in term_list[1:]:
+            terms += term
+        # Initialize the GAM model with the specified terms and additional parameters.
+        self.gam = LinearGAM(terms, **self.params)
+        
+        # Fit the model on your training data.
+        self.gam.fit(x.values, y.values)
+
+    def predict(self, x: pd.DataFrame):
+        # Predict using the trained GAM model.
+        if self.gam is None:
+            raise ValueError("Model has not been trained yet.")
+        return self.gam.predict(x.values)
