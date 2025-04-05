@@ -153,10 +153,10 @@ class SimpleEncoding:
         :return: three numpy arrays
 
         """
-        features_past = self.features[: self.end_training].values.reshape(-1, 1)
+        features_past = self.features[: self.end_training].values
         features_future = self.features[
             self.start_forecast : self.end_forecast
-        ].values.reshape(-1, 1)
+        ].values
 
         features_past = features_past[self.consumption_mask]
         return features_past, features_future, self.consumption
