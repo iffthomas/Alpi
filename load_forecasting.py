@@ -110,8 +110,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
                 feature_past, feature_future, consumption_clean, consumption_test = encoding.calculate_features()
 
-                print(feature_past, feature_future)
-
             else:
                 print("NO Encoding specified sofar")
                 raise ValueError("No encoding specified")
@@ -220,7 +218,7 @@ if __name__ == "__main__":
 
     main(country,
         encoding_name="calculate_custom_features",
-        model_name="xgboost",
+        model_name="linear_regression",
         train_test=train_test,
         split_date=split_date,
         feature_sets=features,
