@@ -211,7 +211,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     print(f'Dummy Error {dummy_error}')
 
 if __name__ == "__main__":
-    country = "IT"  # it can be ES or IT
+    country = "ES"  # it can be ES or IT
     split_date = "2024-07-01 00:00:00"
     train_test = True
     features = ["temp"]
