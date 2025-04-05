@@ -242,13 +242,7 @@ class FeatureEncoding:
 
         rollout = np.abs(self.features[customer_name] - self.consumption)
         rollout = rollout[rollout > 0].sum()
-
-        if rollout > 200:
-            #drop customer_name column
-            self.features = self.features.drop(columns=[customer_name])
         
-
-
 
         for feature in self.features.columns:
             #if data type is categorical, do mode imputation

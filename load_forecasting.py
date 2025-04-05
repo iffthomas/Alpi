@@ -10,7 +10,7 @@ from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding, Fe
 from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel, GAMModel
 import warnings
 warnings.filterwarnings("ignore")
-def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split_date :str , feature_sets:str, global_model: bool, inputation_method:str = "ffill"):
+def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split_date :str , feature_sets:str, global_model: bool, inputation_method:str = "ffill", start_date:str = None):
     """
 
     Train and evaluate the models for IT and ES
@@ -52,7 +52,16 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     team_name = "LehmanBrothers"
     # Data Manipulation and Training
     start_training = training_set.index.min()
+
+    if start_date is not None:
+        #find the index of the start date in the training set
+        start_training = training_set.index.get_loc(start_date)
+        #get the date of the index
+        start_training = training_set.index[start_training]
+        print(start_training)
+
     end_training = training_set.index.max()
+    print(end_training)
     start_forecast, end_forecast = test_set.index[0], test_set.index[-1]
     range_forecast = pd.date_range(start=start_forecast, end=end_forecast, freq="1H")
 
@@ -223,13 +232,23 @@ if __name__ == "__main__":
     features = ["temp"]
     global_model = False
     inputation_method = "mean"
+    start_date = "2023-05-01 00:00:00"
+    single_run = True
 
-    main(country,
-        encoding_name="calculate_custom_features",
-        model_name="gam",
-        train_test=train_test,
-        split_date=split_date,
-        feature_sets=features,
-        global_model=global_model,
-        inputation_method=inputation_method
-        )
+
+    if single_run == True:
+        print("------------------------------------------------------")
+        print("Running the models for the country: ", country)
+        print("------------------------------------------------------")
+        print("Using the imputation method: ", inputation_method)
+        print("Using the start date: ", start_date)
+        main(country,
+            encoding_name="calculate_custom_features",
+            model_name="xgboost",
+            train_test=train_test,
+            split_date=split_date,
+            feature_sets=features,
+            global_model=global_model,
+            inputation_method=inputation_method,
+            start_date=start_date
+            )

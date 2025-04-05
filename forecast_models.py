@@ -93,6 +93,8 @@ class XGBoostModel:
     def predict(self, x):
 
         return self.xgboost.predict(x)
+    
+    
 from pygam import LinearGAM, s, f
 import numpy as np
 import pandas as pd
