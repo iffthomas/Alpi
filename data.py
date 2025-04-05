@@ -238,7 +238,6 @@ class FeatureEncoding:
         customer_name = self.customer
         customer_name = customer_name.replace("VALUEMWHMETERINGDATA","INITIALROLLOUTVALUE")
         feature_cols = ["spv","temp","holiday","DATETIME_COPY",customer_name]
-
         self.features = self.features[feature_cols]
 
         self.features["Month"] = self.features["DATETIME_COPY"].dt.month
