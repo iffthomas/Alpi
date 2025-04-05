@@ -29,8 +29,8 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     if train_test == True:
         print(f"Train_testing will be done with {split_date} ")
         training_set, test_set, train_features, test_features = loader.load_data_train_test(country = country, 
-                                                                                                           split_date=split_date
-                                                                                                           )
+                                                                                            split_date=split_date
+                                                                                            )
         
         #join train_features and test_features
         features_train_and_test = pd.concat([train_features,test_features])
@@ -144,7 +144,29 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     """
 
     # test to make sure that the output has the expected shape.
-    dummy_error = np.abs(forecast - test_set).sum().sum()
+    dummy_error = np.abs(forecast - test_set)
+
+    numpy_error = dummy_error.to_numpy()
+    customer_id = dummy_error.columns.tolist()
+
+    # 1. Mean error for each customer (mean along the time axis)
+    mean_error_per_customer = np.mean(numpy_error, axis=0)
+
+    # 2. Max of the mean errors for each customer
+    max_mean_error = np.max(mean_error_per_customer)
+    max_mean_error_index = np.argmax(mean_error_per_customer)
+
+    # 3. Overall mean error for all customers (mean across both time and customers)
+    overall_mean_error = np.mean(numpy_error)
+
+    # 4. Single maximum error from all the points
+    max_error = np.max(numpy_error)
+
+    print("\n")
+    print(f"Max Mean Error: {max_mean_error:.4f} by: {customer_id[max_mean_error_index]}")
+    print(f"Overall Mean Error:{overall_mean_error:.4f}")
+    print(f"Max Error:{max_error:.4f}")
+
     assert np.all(forecast.columns == test_set.columns), (
         "Wrong header or header order."
     )
@@ -152,7 +174,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
         "Wrong index or index order."
     )
 
-    assert isinstance(dummy_error, np.float64), "Wrong dummy_error type."
     assert forecast.isna().sum().sum() == 0, "NaN in forecast."
     
     # Your solution will be evaluated using
@@ -171,8 +192,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
     #log results with the name of the model that was used, the country and the error as a csv file aswell as the testset datetime start 
     #and end time date
-
-
     
     log_results(model_name=model_name,
                 country=zone,
@@ -191,19 +210,17 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
         join(output_path, "students_results_" + team_name + "_" + country + ".csv")
     )
 
-    print(f'Dummy Error {dummy_error}')
-
 if __name__ == "__main__":
     country = "ES"  # it can be ES or IT
     split_date = "2024-07-01 00:00:00"
     train_test = True
-    features = ["temp"]
+    features = ["temp", "holiday"]  # choice = ["temp", "holiday"]
     global_model = False
-    inputation_method = "past-year"
+    inputation_method = "mean"  # choice = ["ffill", "bfill", "mean", "past-year"]
 
     main(country,
-        encoding_name="custom_encoding",
-        model_name="xgboost",
+        encoding_name="baseline_encoding",  # choice = ["baseline_encoding", "custom_encoding"]
+        model_name="gaussian_process",  # choice = ["linear_regression", "arima", "gaussian_process", "xgboost"]
         train_test=train_test,
         split_date=split_date,
         feature_sets=features,

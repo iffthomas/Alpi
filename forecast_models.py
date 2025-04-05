@@ -1,5 +1,5 @@
 from sklearn.linear_model import LinearRegression
-
+from statsmodels.tsa.arima.model import ARIMA
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 import xgboost as xgb
@@ -18,8 +18,6 @@ class SimpleModel:
 
     def predict(self, x):
         return self.linear_regression.predict(x)
-
-from statsmodels.tsa.arima.model import ARIMA
 
 class ARIMAModel:
     """This is an ARIMA Model that is used for predicting a specific timeframe"""
