@@ -291,7 +291,7 @@ if __name__ == "__main__":
         print("Using the start date: ", start_date)
         main(country,
             encoding_name="calculate_custom_features",
-            model_name="multi_time_series",
+            model_name="xgboost_gridsearch",
             train_test=train_test,
             split_date=split_date,
             feature_sets=features,
