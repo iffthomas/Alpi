@@ -212,7 +212,7 @@ class FeatureEncoding:
         feature_cols = ["spv","temp","holiday","DATETIME_COPY",customer_name]
 
         self.features = self.features[feature_cols]
-        
+
         self.features["Month"] = self.features["DATETIME_COPY"].dt.month
         self.features["Day"] = self.features["DATETIME_COPY"].dt.day
         self.features["Hour"] = self.features["DATETIME_COPY"].dt.hour
@@ -233,6 +233,8 @@ class FeatureEncoding:
 
         #drop Datetime column
         self.features = self.features.drop(columns=["DATETIME_COPY"])
+
+
 
 
         for feature in self.features.columns:
