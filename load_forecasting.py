@@ -108,8 +108,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                 feature_past, feature_future, consumption_clean, consumption_test= (
                     encoding.meta_encoding()
                 )
-
-                pass
         
             elif encoding_name=="calculate_custom_features":
 
