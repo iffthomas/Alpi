@@ -57,7 +57,6 @@ class RandomForestModel:
         # Predict using the trained model
         return self.random_forest.predict(x)
 
-
 class ARIMAModel:
     """This is an ARIMA Model that is used for predicting a specific timeframe"""
     
