@@ -92,8 +92,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
                 feature_dummy = features[feature_sets].loc[start_training:]
 
             
-
-
             if encoding_name == "baseline_encoding":
 
                 encoding = SimpleEncoding(
@@ -270,8 +268,6 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     #log results with the name of the model that was used, the country and the error as a csv file aswell as the testset datetime start 
     #and end time date
 
-
-    
     log_results(model_name=model_name,
                 country=zone,
                 error=dummy_error,
@@ -293,7 +289,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
 if __name__ == "__main__":
     country = "IT"  # it can be ES or IT
-    split_date = "2024-07-01 00:00:00"
+    split_date = "2024-08-01 00:00:00"
     train_test = True
     features = ["temp"]
     global_model = False
@@ -310,7 +306,7 @@ if __name__ == "__main__":
         print("Using the start date: ", start_date)
         main(country,
             encoding_name="calculate_custom_features",
-            model_name="xgboost",
+            model_name="ligthgbm",
             train_test=train_test,
             split_date=split_date,
             feature_sets=features,

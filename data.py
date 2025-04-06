@@ -57,6 +57,21 @@ class DataLoader:
 
         consumptions_path = join(self.path, "historical_metering_data_" + country + ".csv")
 
+        if split_date == "2024-08-01 00:00:00":
+            example_set_path = f"datasets2025\example_set_{country}.csv"
+            example_solution = pd.read_csv(
+                example_set_path,
+                index_col=0,
+                parse_dates=True,
+                date_format=date_format,
+            )
+
+        
+        
+
+
+
+
         features_path = join(self.path, "spv_ec00_forecasts_es_it.xlsx")
         example_solution_path = join(self.path, "example_set_" + country + ".csv")
 
@@ -67,6 +82,14 @@ class DataLoader:
         consumptions = pd.read_csv(
             consumptions_path, index_col=0, parse_dates=True, date_format=date_format
         )
+
+        if split_date == "2024-08-01 00:00:00":
+            print("Splitting here")
+
+            consumptions = pd.concat([consumptions, example_solution])
+
+
+
         features = pd.read_excel(
             features_path,
             sheet_name=country,
