@@ -4,7 +4,6 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 import xgboost as xgb
 
-from catboost import CatBoostRegressor
 import pandas as pd
 import numpy as np
 
@@ -49,6 +48,7 @@ class ARIMAModel:
 
 
 from statsmodels.tsa.statespace.sarimax import SARIMAX
+
 
 class MultiTimeSeriesForecaster:
     def __init__(self, order=(1, 1, 1), seasonal_order=(1, 1, 1, 24*7*4)):
@@ -127,31 +127,37 @@ class XGBoostModel:
 
         return self.xgboost.predict(x)
     
+import lightgbm as lgb
+import pandas as pd
+import numpy as np
 
+class LightGBMModel:
 
-class CatBoostModel:
     def __init__(self, params=None):
-        default_params = {
-            'iterations': 500,
-            'learning_rate': 0.05,
-            'depth': 6,
-            'loss_function': 'RMSE',
-            'verbose': 100,
-        }
-        if params:
-            default_params.update(params)
+        # Use provided params or set defaults
+        if params is None:
+            params = {
+                'boosting_type': 'gbdt',
+                'objective': 'regression',
+                'n_estimators': 100,
+                'random_state': 42,
 
-        self.model = CatBoostRegressor(**default_params)
+            }
+        self.model = lgb.LGBMRegressor(**params)
 
-    def train(self, x, y, cat_features=None):
-        # Align x and y (in case y had NaNs)
+    def train(self, x, y):
+        # Drop NaNs and Infs
         y = y.dropna()
         x = x.loc[y.index]
-
-        self.model.fit(x, y, cat_features=cat_features)
+        
+        self.model.fit(x, y)
 
     def predict(self, x):
         return self.model.predict(x)
+
+
+class CatBoostModel:
+    pass
 
 
 from pygam import LinearGAM, s, f

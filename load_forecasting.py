@@ -8,7 +8,7 @@ from xgboost import XGBRegressor
 # depending on your IDE, you might need to add datathon_eth. in front of data
 from data import DataLoader, SimpleEncoding, log_results, ImputationEncoding, FeatureEncoding
 # depending on your IDE, you might need to add datathon_eth. in front of forecast_models
-from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel, GAMModel, CatBoostModel, MultiTimeSeriesForecaster
+from forecast_models import SimpleModel, ARIMAModel, GaussianProcessModel, XGBoostModel, GAMModel, CatBoostModel, MultiTimeSeriesForecaster, LightGBMModel
 import warnings
 warnings.filterwarnings("ignore")
 def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split_date :str , feature_sets:str, global_model: bool, inputation_method:str = "ffill", start_date:str = None):
@@ -165,10 +165,20 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
 
             elif model_name == "catboost":
                 # CatBoost Model
-                model = CatBoostModel()
+                try:
+                    model = CatBoostModel()
+                    model.train(feature_past, consumption_clean)
+                    output = model.predict(feature_future)
+                except Exception as e:
+                    custom_col = [col for col in feature_past.columns if costumer in col]
+                    output = feature_future[custom_col]
+
+            elif model_name == "ligthgbm":
+                # LightGBM Model
+                model = LightGBMModel()
                 model.train(feature_past, consumption_clean)
                 output = model.predict(feature_future)
-
+            
             elif model_name == "xgboost_gridsearch":
         
                 # Uncomment the grid search code to use GridSearchCV for hyperparameter tuning
@@ -282,7 +292,7 @@ def main(zone: str, encoding_name: str, model_name: str, train_test: bool, split
     print(f'Dummy Error {dummy_error}')
 
 if __name__ == "__main__":
-    country = "ES"  # it can be ES or IT
+    country = "IT"  # it can be ES or IT
     split_date = "2024-07-01 00:00:00"
     train_test = True
     features = ["temp"]
@@ -300,7 +310,7 @@ if __name__ == "__main__":
         print("Using the start date: ", start_date)
         main(country,
             encoding_name="calculate_custom_features",
-            model_name="xgboost_gridsearch",
+            model_name="xgboost",
             train_test=train_test,
             split_date=split_date,
             feature_sets=features,

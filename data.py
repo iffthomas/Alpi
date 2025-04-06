@@ -227,6 +227,7 @@ class FeatureEncoding:
         self.features["log_spv"] = np.log(self.features["spv"] + 1e-9)  # Adding a small constant to avoid log(0)
         self.features["log_temp"] = np.log(self.features["temp"] + 1e-9)  # Adding a small constant to avoid log(0)
 
+
         self.features["cosine_hour"] = np.cos(2 * np.pi * self.features["Hour"] / 24)
         self.features["sine_hour"] = np.sin(2 * np.pi * self.features["Hour"] / 24)
 
@@ -236,13 +237,10 @@ class FeatureEncoding:
         self.features["cosine_month"] = np.cos(2 * np.pi * self.features["Month"] / 12)
         self.features["sine_month"] = np.sin(2 * np.pi * self.features["Month"] / 12)
 
+
         #drop Datetime column
+        # Drop the unnecessary column
         self.features = self.features.drop(columns=["DATETIME_COPY"])
-
-
-        rollout = np.abs(self.features[customer_name] - self.consumption)
-        rollout = rollout[rollout > 0].sum()
-        
 
         for feature in self.features.columns:
             #if data type is categorical, do mode imputation
@@ -251,8 +249,6 @@ class FeatureEncoding:
             else:
                 self.features[feature] = self.features[feature].fillna(self.features[feature].mean())
         self.consumption = self.consumption.fillna(self.consumption.mean())
-
-
 
 
         # Example feature calculation: mean and standard deviation of consumption
